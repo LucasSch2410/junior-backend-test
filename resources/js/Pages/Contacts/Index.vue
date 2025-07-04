@@ -20,7 +20,6 @@
       </Column>
     </DataTable>
 
-    <!-- Paginação laravel -->
     <div v-if="contacts.links" class="flex justify-center mt-4">
       <Button
         v-for="link in contacts.links"
@@ -34,7 +33,7 @@
       />
     </div>
 
-    <ContactForm v-if="showForm" v-model="showForm" :contact="editing" @saved="onSaved" />
+    <ContactForm v-if="showForm" v-model="showForm" :contact="editing" />
   </div>
 </template>
 
@@ -43,32 +42,26 @@ import { ref } from 'vue'
 import { usePage, router } from '@inertiajs/vue3'
 import DataTable from 'primevue/datatable'
 import Column    from 'primevue/column'
-import Button from 'primevue/button';
-import { useConfirm } from 'primevue/useconfirm';
-import ContactForm from './ContactForm.vue'
+import Button from 'primevue/button'
+import { useConfirm } from 'primevue/useconfirm'
+import ContactForm from '../../components/ContactForm.vue'
 import ConfirmDialog from 'primevue/confirmdialog'
+import { ContactEntity } from "../../types/ContactEntity";
 
-type Contact = { id?: number; name: string; email: string; phone: string }
-
-const confirm = useConfirm();
-const page = usePage<{ contacts: any }>();
+const confirm = useConfirm()
+const page = usePage<{ contacts: any }>()
 const contacts = page.props.contacts
 const showForm = ref(false)
-const editing = ref<Contact|null>(null)
+const editing = ref<ContactEntity|null>(null)
 
-function openCreate () { 
-  editing.value = null 
-  showForm.value = true 
+function openCreate () {
+  editing.value = null
+  showForm.value = true
 }
 
-function openEdit(c:Contact){ 
-  editing.value = {...c} 
-  showForm.value = true 
-}
-
-function onSaved() {
-  showForm.value = false
-  router.visit(window.location.pathname)
+function openEdit(c:ContactEntity){
+  editing.value = {...c}
+  showForm.value = true
 }
 
 function destroyContact(id: number) {
@@ -84,9 +77,9 @@ function destroyContact(id: number) {
   })
 }
 
-function visit(l:any){ 
-  if(l.url) 
-  router.visit(l.url) 
+function visit(l:any){
+  if(l.url)
+  router.visit(l.url)
 }
 
 function displayLabel(link: any) {
@@ -99,6 +92,6 @@ function formatPhone(p: string) {
   if (p.length === 11) {
     return p.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3')
   }
-  return p;
+  return p
 }
 </script>

@@ -41,18 +41,13 @@ import Dialog from 'primevue/dialog';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
 import InputMask from 'primevue/inputmask';
+import {ContactEntity} from "../types/ContactEntity";
 
 interface Props {
-  contact?: {
-    id?: number;
-    name: string;
-    email: string;
-    phone: string;
-  } | null;
+  contact?: ContactEntity | null;
 }
 
 const props = defineProps<Props>();
-const emit = defineEmits(['close', 'saved']);
 const showForm = defineModel()
 
 const visible = ref(true);
