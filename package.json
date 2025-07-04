@@ -16,6 +16,9 @@
         "vite": "^6.0.11"
     },
     "dependencies": {
-        "@inertiajs/vue3": "^2.0.14"
+        "@inertiajs/vue3": "^2.0.14",
+        "@primeuix/themes": "^1.2.1",
+        "primeicons": "^7.0.0",
+        "primevue": "^4.3.6"
     }
 }

@@ -1,11 +1,7 @@
 <?php
 
-use App\Http\Controllers\CreateContactController;
+use App\Http\Controllers\ContactsController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', function () {
-    return Inertia::render('Contacts');
-});
-
-Route::post('/contacts', CreateContactController::class);
+Route::resource('contacts', ContactsController::class)->only(['index','store','update','destroy']);
