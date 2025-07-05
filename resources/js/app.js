@@ -3,6 +3,7 @@ import '../css/app.css';
 import 'primeicons/primeicons.css'
 import { createApp, h } from 'vue';
 import PrimeVue from 'primevue/config';
+import ToastService from 'primevue/toastservice';
 import ConfirmationService from 'primevue/confirmationservice';
 import { createInertiaApp } from '@inertiajs/vue3'
 import Aura from '@primeuix/themes/aura';
@@ -16,6 +17,7 @@ createInertiaApp({
       createApp({ render: () => h(App, props) })
         .use(plugin)
         .use(ConfirmationService)
+        .use(ToastService)
         .use(PrimeVue, {
             theme: {
                 preset: Aura,

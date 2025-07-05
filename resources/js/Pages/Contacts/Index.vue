@@ -6,9 +6,18 @@
       <Button label="Novo" icon="pi pi-plus" @click="openCreate" />
     </div>
 
-    <DataTable :value="contacts.data" dataKey="id">
-      <Column field="name"  header="Nome"  sortable />
-      <Column field="email" header="E-mail" sortable />
+    <DataTable :value="contacts.data" dataKey="id" stripedRows :lazy="true" :paginator="true"     
+      paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
+      :loading="loading"
+      :first="(contacts.current_page - 1) * contacts.per_page"
+      :key="contacts.current_page"
+      :page="contacts.current_page"
+      :totalRecords="contacts.total"
+      @page="visit($event)"
+      :rows="contacts.per_page"
+      >
+      <Column field="name"  header="Nome" />
+      <Column field="email" header="E-mail" />
       <Column header="Telefone">
         <template #body="{ data }">{{ formatPhone(data.phone) }}</template>
       </Column>
@@ -38,30 +47,34 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { usePage, router } from '@inertiajs/vue3'
-import DataTable from 'primevue/datatable'
-import Column    from 'primevue/column'
-import Button from 'primevue/button'
-import { useConfirm } from 'primevue/useconfirm'
-import ContactForm from '../../components/ContactForm.vue'
-import ConfirmDialog from 'primevue/confirmdialog'
-import { ContactEntity } from "../../types/ContactEntity";
+import { computed, ref } from 'vue';
+import { usePage, router } from '@inertiajs/vue3';
+import { useConfirm } from 'primevue/useconfirm';
+import AppLayout from '@/Layouts/AppLayout.vue';
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+import Button from 'primevue/button';
+import ConfirmDialog from 'primevue/confirmdialog';
+import ContactForm from '@/components/ContactForm.vue';
+import { PageProps } from '@/types/Inertia';
+import { ContactEntity } from '@/types/ContactEntity';
 
+defineOptions({ layout: AppLayout });
 
+const page = usePage<PageProps>();
 const confirm = useConfirm();
-const page = usePage<{ contacts: any }>();
-const contacts = computed(() => page.props.contacts)
-const showForm = ref(false)
-const editing = ref<ContactEntity|null>(null)
+const contacts = computed(() => page.props.contacts);
+const showForm = ref(false);
+const editing = ref<ContactEntity | null>(null);
+const loading = ref(false);
 
 function openCreate () {
   editing.value = null
   showForm.value = true
 }
 
-function openEdit(c:ContactEntity){
-  editing.value = {...c}
+function openEdit (contact: ContactEntity){ 
+  editing.value = {...contact}
   showForm.value = true
 }
 
@@ -84,9 +97,18 @@ function destroyContact(id: number) {
   })
 }
 
-function visit(l:any){
-  if(l.url)
-  router.visit(l.url)
+function visit(event:any){
+  const page = event.page + 1; 
+  loading.value = true;
+  
+  router.visit(`/contacts?page=${page}`, {
+    preserveScroll: true,
+    preserveState: true,
+    only: ['contacts'],
+    onFinish: () => {
+      loading.value = false;
+    },
+  });
 }
 
 function displayLabel(link: any) {
@@ -96,6 +118,9 @@ function displayLabel(link: any) {
 }
 
 function formatPhone(p: string) {
+  if (p.length === 10) {
+    return p.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3')
+  }
   if (p.length === 11) {
     return p.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3')
   }

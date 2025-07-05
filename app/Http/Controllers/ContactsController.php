@@ -40,7 +40,10 @@ class ContactsController extends Controller
 
     public function update(ContactsRequest $request, Contact $contact): Response|RedirectResponse
     {
-        $contact->update($request->validated());
+        $payload = $request->validated();
+        $payload['phone'] = preg_replace('/\D/', '', $payload['phone']);
+
+        $contact->update($payload);
 
         return redirect()->route('contacts.index')->with('success', 'Contato atualizado com sucesso!');
     }
