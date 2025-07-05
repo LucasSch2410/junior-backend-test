@@ -1,18 +1,90 @@
-Objective:
+# Sistema de Gerenciamento de Contatos - Fruitfy
 
-Back-end Assessment: [ ] Make all tests pass, applying the best practices of Laravel and SOLID and clean arch
+## Como executar o projeto
 
-Front-end Assessment: [ ] Implement a front-end using Inertia.js, Vue3 and TailwindCss for contact CRUD
+1. **Clonar o repositório**
 
-* Plus: Feel free to implement improvements and more features as you wish, such as sending an email to the contact when that contact is deleted from the system.
+   ```bash
+   git clone https://github.com/LucasSch2410/junior-backend-test.git
+   cd junior-backend-test
+   ```
 
-# Installation
-1. Clone the repository
-2. Have PHP 8.3 installed on your machine, composer 2, and activate the extensions requested by composer when running "composer install"
-3. Run "Composer install"
-4. Create a .env file and paste the contents of .env.example
-5. Run the command php artisan key:generate
-6. Run the command php artisan test, solve the tests
+2. **Instalar dependências do PHP**
 
-7. After the test is complete, create a repository on github, and upload your resolution to the repository
-8. Send the repository link to WhatsApp +55 41 98702-5814
+   ```bash
+   composer install
+   ```
+
+3. **Configurar ambiente**
+
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
+
+4. **Configurar banco de dados**
+   - touch database/database.sqlite
+
+5. **Executar migrações**
+
+   ```bash
+   php artisan migrate
+   ```
+
+6. **Instalar dependências frontend**
+
+   ```bash
+   npm install
+   npm run build
+   ```
+
+7. **Iniciar servidor de desenvolvimento**
+
+   ```bash
+   php artisan serve
+   ```
+
+   Acesse: [http://localhost:8000/contacts](http://localhost:8000/contacts)
+
+## 📋 Rotas disponíveis
+
+- `GET /contacts` — Lista todos os contatos (com paginação)
+- `POST /contacts` — Cria um novo contato
+- `PUT /contacts/{contact}` — Atualiza um contato existente
+- `DELETE /contacts/{contact}` — Remove um contato
+
+## ✨ Funcionalidades
+
+- **CRUD completo** de contatos
+- **Busca** por nome, e-mail, telefone e notas
+- **Paginação** com 10 itens por página
+- **Validação** de formulários
+- **Notificações por e-mail** ao excluir contatos
+- **Interface responsiva** com PrimeVue
+
+## 🛠️ Tecnologias utilizadas
+
+- **Backend**: Laravel 11
+- **Frontend**: Vue 3, Inertia.js, PrimeVue, TypeScript
+- **Banco de Dados**: SQLite
+- **Estilização**: TailwindCSS
+- **Ferramentas de Desenvolvimento**: Vite, Composer, npm
+
+## 📝 Notas de desenvolvimento
+
+- O projeto segue os padrões do Laravel
+- Código limpo e organizado
+- Documentação clara e objetiva
+- Fácil manutenção e extensão
+- Tipagem com TypeScript
+
+## 📬 Contato
+
+Em caso de dúvidas ou sugestões, entre em contato:
+- **Nome**: Lucas Schroeder
+- **E-mail**: [seu-email@exemplo.com](mailto:lucasschroeder2410@gmail.com)
+- **GitHub**: [LucasSch2410](https://github.com/LucasSch2410)
+
+---
+
+Desenvolvido com ❤️ por Lucas

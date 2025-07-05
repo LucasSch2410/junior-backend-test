@@ -1,4 +1,7 @@
 <template>
+  <Head>
+    <title>Fruitfy - Contatos</title>
+  </Head>
   <ConfirmDialog></ConfirmDialog>
   <div class="p-8 space-y-4 max-w-7xl mx-auto">
     <div class="flex justify-between items-center">
@@ -73,7 +76,7 @@
 
 <script setup lang="ts">
 import { computed, ref, watch, onMounted } from 'vue';
-import { usePage, router } from '@inertiajs/vue3';
+import { Head, usePage, router } from '@inertiajs/vue3';
 import { useConfirm } from 'primevue/useconfirm';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import DataTable from 'primevue/datatable';
