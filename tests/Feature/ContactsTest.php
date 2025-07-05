@@ -9,7 +9,7 @@ use Inertia\Testing\AssertableInertia as Assert;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
-class CreateContactsTest extends TestCase
+class ContactsTest extends TestCase
 {
     use RefreshDatabase;
 
