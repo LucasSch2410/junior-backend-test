@@ -26,16 +26,7 @@ Antes de iniciar, você precisa realizar a configuração inicial:
 Após a configuração inicial, você pode iniciar o projeto de duas maneiras. Escolha a sua preferida:
 
 * **[🐳 Executar com Docker](#-executando-com-docker)** (Recomendado, mais simples)
-* **[⚙️ Executar Manualmente](#-executando-manualmente)** (Requer PHP e Node.js instalados)
-
-<<<<<<< HEAD
-   ```bash
-   npm install
-   npm run dev
-   ```
-=======
----
->>>>>>> d391d12 (feat(docker): new docker environment)
+* **[⚙️ Executando Manualmente](#-executando-manualmente)** (Requer PHP e Node.js instalados)
 
 ### ⚙️ Executando Manualmente
 
