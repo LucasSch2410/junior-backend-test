@@ -6,20 +6,58 @@
       <Button label="Novo" icon="pi pi-plus" @click="openCreate" />
     </div>
 
-    <DataTable :value="contacts.data" dataKey="id" stripedRows :lazy="true" :paginator="true"     
+    <div class="card mb-4">
+      <div class="flex justify-content-between align-items-center mb-4">
+        <span class="p-input-icon-left w-full">
+          <IconField>
+            <InputIcon>
+              <i class="pi pi-search" />
+            </InputIcon>
+            <InputText 
+              v-model="searchQuery" 
+              @update:modelValue="handleSearch"
+              placeholder="Buscar contatos..." 
+              class="w-full"
+              :loading="loading"
+            />
+          </IconField>
+        </span>
+      </div>
+    </div>
+
+    <DataTable 
+      :value="contacts.data" 
+      dataKey="id" 
+      stripedRows 
+      :lazy="true" 
+      :paginator="true"
       paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
       :loading="loading"
       :first="(contacts.current_page - 1) * contacts.per_page"
       :key="contacts.current_page"
       :page="contacts.current_page"
       :totalRecords="contacts.total"
-      @page="visit($event)"
+      @page="visit"
       :rows="contacts.per_page"
-      >
-      <Column field="name"  header="Nome" />
+    >
+      <Column field="name" header="Nome">
+        <template #body="{ data }">
+          <div class="flex items-center gap-3">
+            <span>{{ data.name }}</span>
+          </div>
+        </template>
+      </Column>
       <Column field="email" header="E-mail" />
       <Column header="Telefone">
         <template #body="{ data }">{{ formatPhone(data.phone) }}</template>
+      </Column>
+      <Column header="Notas">
+        <template #body="{ data }">
+          <span v-if="data.notes" v-tooltip.top="data.notes" class="notes-cell">
+            {{ truncateText(data.notes, 30) }}
+          </span>
+          <span v-else class="text-gray-400">-</span>
+        </template>
       </Column>
       <Column header="Ações">
         <template #body="{ data }">
@@ -29,25 +67,12 @@
       </Column>
     </DataTable>
 
-    <div v-if="contacts.links" class="flex justify-center mt-4">
-      <Button
-        v-for="link in contacts.links"
-        :key="link.label"
-        :label="displayLabel(link)"
-        :disabled="!link.url"
-        :severity="link.active ? 'primary' : undefined"
-        text
-        size="small"
-        @click="visit(link)"
-      />
-    </div>
-
     <ContactForm v-if="showForm" v-model="showForm" :contact="editing" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch, onMounted } from 'vue';
 import { usePage, router } from '@inertiajs/vue3';
 import { useConfirm } from 'primevue/useconfirm';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -58,6 +83,9 @@ import ConfirmDialog from 'primevue/confirmdialog';
 import ContactForm from '@/components/ContactForm.vue';
 import { PageProps } from '@/types/Inertia';
 import { ContactEntity } from '@/types/ContactEntity';
+import InputText from 'primevue/inputtext';
+import IconField from 'primevue/iconfield';
+import InputIcon from 'primevue/inputicon';
 
 defineOptions({ layout: AppLayout });
 
@@ -67,6 +95,46 @@ const contacts = computed(() => page.props.contacts);
 const showForm = ref(false);
 const editing = ref<ContactEntity | null>(null);
 const loading = ref(false);
+
+const searchQuery = ref('');
+let searchTimeout: ReturnType<typeof setTimeout> | null = null;
+
+const initSearchQuery = () => {
+  const params = new URLSearchParams(window.location.search);
+  searchQuery.value = params.get('search') || '';
+};
+
+const handleSearch = () => {
+  if (searchTimeout) {
+    clearTimeout(searchTimeout);
+  }
+
+  searchTimeout = setTimeout(() => {
+    loading.value = true;
+    
+    router.get(
+      '/contacts',
+      { search: searchQuery.value },
+      {
+        preserveState: true,
+        preserveScroll: true,
+        replace: true,
+        only: ['contacts'],
+        onFinish: () => {
+          loading.value = false;
+        },
+      }
+    );
+  }, 500);
+};
+
+onMounted(() => {
+  initSearchQuery();
+});
+
+watch(() => window.location.search, () => {
+  initSearchQuery();
+});
 
 function openCreate () {
   editing.value = null
@@ -97,11 +165,14 @@ function destroyContact(id: number) {
   })
 }
 
-function visit(event:any){
-  const page = event.page + 1; 
+function visit(event: any) {
+  const page = event.page + 1;
   loading.value = true;
   
-  router.visit(`/contacts?page=${page}`, {
+  const params = new URLSearchParams(window.location.search);
+  const search = params.get('search') || '';
+  
+  router.visit(`/contacts?page=${page}&search=${search}`, {
     preserveScroll: true,
     preserveState: true,
     only: ['contacts'],
@@ -111,19 +182,21 @@ function visit(event:any){
   });
 }
 
-function displayLabel(link: any) {
-  if (link.label.includes('Previous')) return 'Anterior'
-  if (link.label.includes('Next')) return 'Próximo'
-  return link.label
-}
-
 function formatPhone(p: string) {
-  if (p.length === 10) {
-    return p.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3')
+  if (!p) return '';
+  const digits = p.replace(/\D/g, '');
+  
+  if (digits.length === 10) {
+    return digits.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
   }
-  if (p.length === 11) {
-    return p.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3')
+  if (digits.length === 11) {
+    return digits.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
   }
   return p;
+}
+
+function truncateText(text: string, maxLength: number) {
+  if (!text) return '';
+  return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
 }
 </script>

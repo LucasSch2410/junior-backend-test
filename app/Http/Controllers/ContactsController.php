@@ -14,10 +14,23 @@ class ContactsController extends Controller
 {
     public function index()
     {
-        $contacts = Contact::paginate(10);
+        $search = request()->input('search');
+        
+        $contacts = Contact::when($search, function($query) use ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%")
+                  ->orWhere('notes', 'like', "%{$search}%");
+            });
+        })
+        ->latest()
+        ->paginate(10)
+        ->withQueryString();
 
         return Inertia::render('Contacts/Index', [
-            'contacts' => $contacts
+            'contacts' => $contacts,
+            'filters' => request()->only(['search'])
         ]);
     }
 

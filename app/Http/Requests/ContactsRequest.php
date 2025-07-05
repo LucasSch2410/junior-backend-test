@@ -24,6 +24,7 @@ class ContactsRequest extends FormRequest
             'name' => ['required', 'string', 'min:3', 'max:100'],
             'email' => ['required', 'string', 'email', 'max:150', Rule::unique('contacts', 'email')->where('deleted_at', null)->ignore($contactId)],
             'phone' => ['required', 'string', 'regex:/^(?:\D*\d){10,20}\D*$/'],
+            'notes' => ['nullable', 'string', 'max:1000'],
         ];
     }
 
@@ -39,6 +40,7 @@ class ContactsRequest extends FormRequest
             'email.unique' => 'O email já existe.',
             'phone.required' => 'O telefone é obrigatório.',
             'phone.regex' => 'O telefone deve ter pelo menos 10 caracteres.',
+            'notes.max' => 'As notas não podem ter mais de 1000 caracteres.',
         ];
     }
 }

@@ -16,21 +16,27 @@
 
     <form @submit.prevent="submit" class="space-y-4">
       <div>
-        <label class="block text-sm font-medium mb-1">Nome</label>
-        <InputText v-model="form.name" class="w-full" placeholder="Seu nome"/>
+        <label class="block text-sm font-medium mb-1">Nome*</label>
+        <InputText v-model="form.name" class="w-full" placeholder="Nome"/>
         <Message v-if="errors.name" severity="error" size="small" variant="simple">{{ errors.name }}</Message>
       </div>
 
       <div>
-        <label class="block text-sm font-medium mb-1">Email</label>
-        <InputText v-model="form.email" type="email" class="w-full" placeholder="Seu email"/>
+        <label class="block text-sm font-medium mb-1">Email*</label>
+        <InputText v-model="form.email" type="email" class="w-full" placeholder="nome@email.com"/>
         <Message v-if="errors.email" severity="error" size="small" variant="simple">{{ errors.email }}</Message>
       </div>
 
       <div class="mb-6">
-        <label class="block text-sm font-medium mb-1">Telefone</label>
+        <label class="block text-sm font-medium mb-1">Telefone*</label>
         <InputMask v-model="form.phone" type="text" class="w-full" :mask="phoneMask" placeholder="(99) 99999-9999" :auto-clear="false" @focus="isPhoneFocused = true" @blur="isPhoneFocused = false" />
         <Message v-if="errors.phone" severity="error" size="small" variant="simple">{{ errors.phone }}</Message>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium mb-1">Notas</label>
+        <Textarea v-model="form.notes" class="w-full" :autoResize="true" rows="3" placeholder="Adicione notas sobre o contato" />
+        <Message v-if="errors.notes" severity="error" size="small" variant="simple">{{ errors.notes }}</Message>
       </div>
 
       <div class="flex justify-end gap-2 pt-2">
@@ -49,8 +55,9 @@ import Dialog from 'primevue/dialog';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
 import InputMask from 'primevue/inputmask';
+import Message from 'primevue/message';
+import Textarea from 'primevue/textarea';
 import { ContactEntity } from "@/types/ContactEntity";
-import { Message } from 'primevue';
 import { useToast } from 'primevue/usetoast';
 
 interface Props {
@@ -68,6 +75,7 @@ const form = reactive({
   name: props.contact?.name ?? '',
   email: props.contact?.email ?? '',
   phone: props.contact?.phone ?? '',
+  notes: props.contact?.notes ?? '',
 });
 
 const errors = reactive<{ [k: string]: string }>({});
@@ -86,6 +94,7 @@ watch(() => props.contact, (newVal) => {
   form.name = newVal?.name ?? '';
   form.email = newVal?.email ?? '';
   form.phone = newVal?.phone ?? '';
+  form.notes = newVal?.notes ?? '';
 });
 
 const schema = yup.object({
@@ -95,10 +104,11 @@ const schema = yup.object({
     const digits = value?.replace(/\D/g, '') || '';
     return digits.length >= 10;
   }),
+  notes: yup.string().max(1000, 'As notas não podem ter mais de 1000 caracteres.').nullable(),
 });
 
 async function submit() {
-  errors.name = errors.email = errors.phone = '';
+  errors.name = errors.email = errors.phone = errors.notes = '';
 
   try {
     await schema.validate(form, { abortEarly: false });
