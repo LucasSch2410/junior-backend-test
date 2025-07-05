@@ -44,7 +44,7 @@ import InputMask from 'primevue/inputmask';
 import {ContactEntity} from "../types/ContactEntity";
 
 interface Props {
-  contact?: ContactEntity | null;
+    contact?: ContactEntity | null;
 }
 
 const props = defineProps<Props>();

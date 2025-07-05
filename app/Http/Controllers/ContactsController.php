@@ -15,7 +15,7 @@ class ContactsController extends Controller
     public function index()
     {
         $contacts = Contact::paginate(10);
-    
+
         return Inertia::render('Contacts/Index', [
             'contacts' => $contacts
         ]);
@@ -23,8 +23,18 @@ class ContactsController extends Controller
 
     public function store(ContactsRequest $request): Response|RedirectResponse
     {
-        $contact = Contact::create($request->validated());
+        $payload = $request->validated();
+        $payload['phone'] = preg_replace('/\D/', '', $payload['phone']);
 
+        $contactExists = Contact::where('email', $payload['email'])->withTrashed()->first();
+
+        if ($contactExists) {
+            $contactExists->restore();
+            $contactExists->update($payload);
+            return redirect()->route('contacts.index')->with('success', 'Contato restaurado com sucesso!');
+        }
+
+        Contact::create($payload);
         return redirect()->route('contacts.index')->with('success', 'Contato criado com sucesso!');
     }
 

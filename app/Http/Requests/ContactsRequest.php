@@ -22,7 +22,7 @@ class ContactsRequest extends FormRequest
         $contactId = $this->route('contact')?->id;
         return [
             'name' => ['required', 'string', 'min:3', 'max:100'],
-            'email' => ['required', 'string', 'email', 'max:150', Rule::unique('contacts', 'email')->ignore($contactId)],
+            'email' => ['required', 'string', 'email', 'max:150', Rule::unique('contacts', 'email')->where('deleted_at', null)->ignore($contactId)],
             'phone' => ['required', 'string', 'regex:/^(?:\D*\d){10,20}\D*$/'],
         ];
     }

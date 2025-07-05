@@ -1,6 +1,6 @@
 <template>
   <ConfirmDialog></ConfirmDialog>
-  <div class="p-8 space-y-4">
+  <div class="p-8 space-y-4 max-w-7xl mx-auto">
     <div class="flex justify-between items-center">
       <h1 class="text-2xl font-bold">Contatos</h1>
       <Button label="Novo" icon="pi pi-plus" @click="openCreate" />
@@ -38,7 +38,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { usePage, router } from '@inertiajs/vue3'
 import DataTable from 'primevue/datatable'
 import Column    from 'primevue/column'
@@ -48,9 +48,10 @@ import ContactForm from '../../components/ContactForm.vue'
 import ConfirmDialog from 'primevue/confirmdialog'
 import { ContactEntity } from "../../types/ContactEntity";
 
-const confirm = useConfirm()
-const page = usePage<{ contacts: any }>()
-const contacts = page.props.contacts
+
+const confirm = useConfirm();
+const page = usePage<{ contacts: any }>();
+const contacts = computed(() => page.props.contacts)
 const showForm = ref(false)
 const editing = ref<ContactEntity|null>(null)
 
@@ -72,8 +73,14 @@ function destroyContact(id: number) {
     acceptLabel: 'Sim',
     rejectLabel: 'Não',
     accept: () => {
-      router.delete(`/contacts/${id}`, { onFinish: () => router.visit(window.location.pathname) })
+      router.delete(`/contacts/${id}`)
     },
+    acceptProps: {
+      severity: 'danger'
+    },
+    rejectProps: {
+      severity: 'secondary'
+    }
   })
 }
 
@@ -92,6 +99,6 @@ function formatPhone(p: string) {
   if (p.length === 11) {
     return p.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3')
   }
-  return p
+  return p;
 }
 </script>
