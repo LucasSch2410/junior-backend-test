@@ -5,17 +5,16 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ContactsRequest;
 use App\Models\Contact;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Response;
-use Illuminate\View\View;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
+use App\Events\ContactDeleted;
 
 class ContactsController extends Controller
 {
-    public function index()
+    public function index(): InertiaResponse
     {
         $search = request()->input('search');
-        
+
         $contacts = Contact::when($search, function($query) use ($search) {
             $query->where(function($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
@@ -34,7 +33,7 @@ class ContactsController extends Controller
         ]);
     }
 
-    public function store(ContactsRequest $request): Response|RedirectResponse
+    public function store(ContactsRequest $request): RedirectResponse
     {
         $payload = $request->validated();
         $payload['phone'] = preg_replace('/\D/', '', $payload['phone']);
@@ -48,10 +47,11 @@ class ContactsController extends Controller
         }
 
         Contact::create($payload);
+        
         return redirect()->route('contacts.index')->with('success', 'Contato criado com sucesso!');
     }
 
-    public function update(ContactsRequest $request, Contact $contact): Response|RedirectResponse
+    public function update(ContactsRequest $request, Contact $contact): RedirectResponse
     {
         $payload = $request->validated();
         $payload['phone'] = preg_replace('/\D/', '', $payload['phone']);
@@ -61,9 +61,13 @@ class ContactsController extends Controller
         return redirect()->route('contacts.index')->with('success', 'Contato atualizado com sucesso!');
     }
 
-    public function destroy(Contact $contact): Response|RedirectResponse
+    public function destroy(Contact $contact): RedirectResponse
     {
+        $contactData = $contact->toArray();
+        
         $contact->delete();
+        
+        event(new \App\Events\ContactDeleted((object) $contactData));
 
         return redirect()->route('contacts.index')->with('success', 'Contato removido com sucesso!');
     }
