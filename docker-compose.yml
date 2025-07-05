@@ -1,5 +1,5 @@
 services:
-    app:
+    junior-backend-test:
         container_name: fruitfy-contacts
         build:
             context: .
