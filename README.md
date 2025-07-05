@@ -24,7 +24,7 @@
 
 4. **Configurar banco de dados**
    ```bash
-   - touch database/database.sqlite
+   touch database/database.sqlite
    ```
 
 5. **Executar migrações**
