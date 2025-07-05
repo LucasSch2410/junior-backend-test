@@ -78,7 +78,7 @@ Este é o método mais fácil para subir o ambiente completo. As dependências s
 1.  **Execute o Docker Compose**
 
     ```bash
-    docker-compose up -d
+    docker compose up -d
     ```
 
 2.  **Acesse a aplicação**
